@@ -7,6 +7,7 @@ import '../features/onboarding/ui/weekly_routine_screen.dart';
 import '../features/auth/ui/login_screen.dart';
 import '../features/auth/ui/signup_screen.dart';
 import '../features/auth/ui/forgot_password_screen.dart';
+import '../features/user/profile_screen.dart';
 import '../features/auth/auth_state.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -18,10 +19,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final user = authState.asData?.value;
       final loggedIn = user != null;
       final current = state.uri.path;
-      final goingToHome = current == '/home';
+      final goingToProtected = current == '/home' || current == '/profile';
       final goingToAuth = current == '/login' || current == '/signup' || current == '/forgot';
 
-      if (!loggedIn && goingToHome) return '/login';
+      if (!loggedIn && goingToProtected) return '/login';
       if (loggedIn && goingToAuth) return '/home';
       return null;
     },
@@ -53,6 +54,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/home',
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const ProfileScreen(),
       ),
     ],
   );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../features/auth/auth_state.dart';
 import '../../shared/widgets/primary_button.dart';
 import 'home_dashboard_state.dart';
@@ -32,8 +33,8 @@ class HomeScreen extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {},
-            tooltip: 'Settings',
+            onPressed: () => GoRouter.of(context).go('/profile'),
+            tooltip: 'Profile',
           ),
         ],
       ),
