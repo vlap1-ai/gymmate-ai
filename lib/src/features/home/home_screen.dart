@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../features/auth/auth_state.dart';
 import '../../shared/widgets/primary_button.dart';
 import 'home_dashboard_state.dart';
 import 'models/home_dashboard_models.dart';
@@ -16,6 +17,19 @@ class HomeScreen extends ConsumerWidget {
         title: const Text('GymMate AI'),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              try {
+                await ref.read(authNotifierProvider.notifier).signOut();
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sign out failed: $e')));
+                }
+              }
+            },
+            tooltip: 'Sign out',
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {},

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../auth_state.dart';
+import 'auth_text_field.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -48,10 +49,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextFormField(
+                  AuthTextField(
                     controller: _emailController,
+                    label: 'Email',
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(labelText: 'Email'),
+                    textInputAction: TextInputAction.done,
                     validator: (v) => (v == null || v.isEmpty || !v.contains('@')) ? 'Enter a valid email' : null,
                   ),
                   const SizedBox(height: 16),

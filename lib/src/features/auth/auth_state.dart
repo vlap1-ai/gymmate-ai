@@ -54,6 +54,18 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
     }
   }
 
+  Future<AppUser?> signInWithApple() async {
+    state = const AsyncValue.loading();
+    try {
+      final user = await _repo.signInWithApple();
+      state = AsyncValue.data(user);
+      return user;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   Future<void> signOut() async {
     state = const AsyncValue.loading();
     try {

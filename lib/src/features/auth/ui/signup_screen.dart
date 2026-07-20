@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../auth_state.dart';
+import 'auth_text_field.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -16,6 +17,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
   bool _submitting = false;
+  bool _showPassword = false;
+  bool _showConfirmPassword = false;
 
   @override
   void dispose() {
@@ -57,24 +60,35 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 children: [
                   Text('Create an account', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
-                  TextFormField(
+                  AuthTextField(
                     controller: _emailController,
+                    label: 'Email',
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(labelText: 'Email'),
+                    textInputAction: TextInputAction.next,
                     validator: (v) => (v == null || v.isEmpty || !v.contains('@')) ? 'Enter a valid email' : null,
                   ),
                   const SizedBox(height: 12),
-                  TextFormField(
+                  AuthTextField(
                     controller: _passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Password'),
+                    label: 'Password',
+                    obscureText: !_showPassword,
+                    textInputAction: TextInputAction.next,
+                    suffixIcon: IconButton(
+                      onPressed: () => setState(() => _showPassword = !_showPassword),
+                      icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
+                    ),
                     validator: (v) => (v == null || v.length < 6) ? 'Password must be 6+ chars' : null,
                   ),
                   const SizedBox(height: 12),
-                  TextFormField(
+                  AuthTextField(
                     controller: _confirmController,
-                    obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Confirm password'),
+                    label: 'Confirm password',
+                    obscureText: !_showConfirmPassword,
+                    textInputAction: TextInputAction.done,
+                    suffixIcon: IconButton(
+                      onPressed: () => setState(() => _showConfirmPassword = !_showConfirmPassword),
+                      icon: Icon(_showConfirmPassword ? Icons.visibility_off : Icons.visibility),
+                    ),
                     validator: (v) => v != _passwordController.text ? 'Passwords do not match' : null,
                   ),
                   const SizedBox(height: 16),

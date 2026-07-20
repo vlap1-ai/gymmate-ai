@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../auth_state.dart';
+import 'auth_text_field.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +18,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _submitting = false;
+  bool _showPassword = false;
 
   @override
   void dispose() {
@@ -32,6 +35,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             _emailController.text.trim(),
             _passwordController.text.trim(),
           );
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
+
+  Future<void> _signInWithApple() async {
+    setState(() => _submitting = true);
+    try {
+      await ref.read(authNotifierProvider.notifier).signInWithApple();
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
@@ -56,17 +70,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 children: [
                   Text('Welcome back', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
-                  TextFormField(
+                  AuthTextField(
                     controller: _emailController,
+                    label: 'Email',
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(labelText: 'Email'),
+                    textInputAction: TextInputAction.next,
                     validator: (v) => (v == null || v.isEmpty || !v.contains('@')) ? 'Enter a valid email' : null,
                   ),
                   const SizedBox(height: 12),
-                  TextFormField(
+                  AuthTextField(
                     controller: _passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Password'),
+                    label: 'Password',
+                    obscureText: !_showPassword,
+                    textInputAction: TextInputAction.done,
+                    suffixIcon: IconButton(
+                      onPressed: () => setState(() => _showPassword = !_showPassword),
+                      icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
+                    ),
                     validator: (v) => (v == null || v.length < 6) ? 'Password must be 6+ chars' : null,
                   ),
                   const SizedBox(height: 16),
@@ -79,14 +99,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   TextButton(
-                    onPressed: () => Navigator.of(context).pushNamed('/forgot'),
+                    onPressed: () => GoRouter.of(context).go('/forgot'),
                     child: const Text('Forgot password?'),
                   ),
                   const SizedBox(height: 8),
                   if (defaultTargetPlatform == TargetPlatform.iOS)
                     OutlinedButton.icon(
-                      onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Apple Sign In not configured'))),
-                      icon: const Icon(Icons.apple),
+                      onPressed: _submitting ? null : _signInWithApple,
+                      icon: _submitting
+                          ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                          : const Icon(Icons.apple),
                       label: const Text('Sign in with Apple'),
                     ),
                   const SizedBox(height: 12),
@@ -94,7 +116,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text('No account?'),
-                      TextButton(onPressed: () => Navigator.of(context).pushNamed('/signup'), child: const Text('Create one')),
+                      TextButton(onPressed: () => GoRouter.of(context).go('/signup'), child: const Text('Create one')),
                     ],
                   ),
                 ],
